@@ -1,0 +1,19 @@
+{
+  "name": "ZadCzat",
+  "version": "1.0.0",
+  "authors": [
+    "Wiesław Pawłowski <w.pawlowski@pjwstk.edu.pl>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.3"
+  }
+}
