@@ -13,10 +13,45 @@ app.use('/js/jquery.min.js', static(__dirname + '/bower_components/jquery/dist/j
 app.use('/js/jquery.min.map', static(__dirname + '/bower_components/jquery/dist/jquery.min.map'));
 app.use(static(__dirname + '/public'));
 
+var users = [];
+
 io.sockets.on("connection", function (socket) {
     socket.on("message", function (data) {
-        io.sockets.emit("echo", "No tak, tak – dostałem: " + data);
+        var user = users.filter(function(element) {
+            return element.socket === socket;
+        })[0];
+        var date = new Date();
+        io.sockets.emit("echo", '[' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString() + '] ' + user.nick + ": " + data);
     });
+    socket.on("nick", function (data) {
+        var alreadyTaken = users.some(function(element) {
+            return element.nick === data;
+        });
+        
+        if (alreadyTaken) {
+            socket.disconnect();
+        } else {
+            users.push({
+                nick: data,
+                socket: socket
+            });
+            var date = new Date();
+            socket.emit("echo", "Witaj " + data + "!");
+            io.sockets.emit("echo", '[' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString() + '] ' + data + ' dołączył do czatu');
+        }
+    });
+    
+    socket.on("disconnect", function(data) {
+        user = users.filter(function(element) {
+            return element.socket === socket;
+        })[0];
+        users = users.filter(function(element) {
+            return element.socket !== socket;
+        });
+        var date = new Date();
+        io.sockets.emit("echo", '[' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString() + '] ' + user.nick + ' rozłączył się');
+    });
+    
     socket.on("error", function (err) {
         console.dir(err);
     });

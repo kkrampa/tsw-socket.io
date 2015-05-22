@@ -4,57 +4,62 @@
 
 // Inicjalizacja
 window.addEventListener("load", function (event) {
-    var status = document.getElementById("status");
-    var open = document.getElementById("open");
-    var close = document.getElementById("close");
-    var send = document.getElementById("send");
-    var text = document.getElementById("text");
-    var message = document.getElementById("message");
+    var status = $("#status");
+    var open = $('#open');
+    var close = $("#close");
+    var send = $("#send");
+    var text = $("#text");
+    var message = $("#message");
+    var nick = $('#nick');
+    
     var socket;
 
-    status.textContent = "Brak połącznia";
+    status.text = "Brak połącznia";
     close.disabled = true;
     send.disabled = true;
 
     // Po kliknięciu guzika „Połącz” tworzymy nowe połączenie WS
-    open.addEventListener("click", function (event) {
+    open.on("click", function (event) {
         open.disabled = true;
         if (!socket || !socket.connected) {
             socket = io({forceNew: true});
         }
         socket.on('connect', function () {
-            close.disabled = false;
-            send.disabled = false;
-            status.src = "img/bullet_green.png";
+            send.prop('disabled', false);
+            close.prop('disabled', false);
+            open.prop('disabled', true);
+
+            status.attr('src', "img/bullet_green.png");
             console.log('Nawiązano połączenie przez Socket.io');
+            socket.emit('nick', nick.val());
         });
         socket.on('disconnect', function () {
-            open.disabled = false;
-            status.src = "img/bullet_red.png";
+            open.prop('disabled', false);
+            status.attr('src', "img/bullet_red.png");
             console.log('Połączenie przez Socket.io zostało zakończone');
         });
         socket.on("error", function (err) {
-            message.textContent = "Błąd połączenia z serwerem: '" + JSON.stringify(err) + "'";
+            message.text("Błąd połączenia z serwerem: '" + JSON.stringify(err) + "'");
         });
         socket.on("echo", function (data) {
-            message.textContent = "Serwer twierdzi, że otrzymał od Ciebie: '" + data + "'";
+            message.prepend('<li>' + data + '</li>');
         });
     });
     
     // Zamknij połączenie po kliknięciu guzika „Rozłącz”
-    close.addEventListener("click", function (event) {
-        close.disabled = true;
-        send.disabled = true;
-        open.disabled = false;
-        message.textContent = "";
+    close.on("click", function (event) {
+        close.prop('disabled', true);
+        send.prop('disabled', true);
+        open.prop('disabled', false);
+        message.val("");
         socket.io.disconnect();
         console.dir(socket);
     });
 
     // Wyślij komunikat do serwera po naciśnięciu guzika „Wyślij”
-    send.addEventListener("click", function (event) {
-        socket.emit('message', text.value);
-        console.log('Wysłałem wiadomość: ' + text.value);
-        text.value = "";
+    send.on("click", function (event) {
+        socket.emit('message', text.val());
+        console.log('Wysłałem wiadomość: ' + text.val());
+        text.val("");
     });
 });

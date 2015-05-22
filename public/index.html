@@ -12,6 +12,10 @@
     <table>
       <tr>
         <td> <img id="status" src="/img/bullet_red.png" width="35"> </td>
+        <td> 
+            <label for="nick">Nick: </label>
+            <input id="nick" type="text"></input>
+        </td>
         <td> <input id="open" type="button" value="Połącz"> </td>
         <td> <input id="close" type="button" value="Rozłącz"> </td>
       </tr>
@@ -20,7 +24,9 @@
       Komunikat:&nbsp;
       <input id="text">&nbsp;<input id="send" type="button" value="Wyślij">
     </p>
-    <p id="message"></p>
+    <ul id="message">
+        
+    </ul>
   </div>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/js/jquery.min.js"></script>
